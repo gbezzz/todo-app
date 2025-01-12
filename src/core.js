@@ -48,6 +48,14 @@ class Todo {
     this.checkList = checkList;
     this.status = status;
   }
+
+  toggleStatus() {
+    if (this.status === 0) {
+      this.status = 1;
+    } else {
+      this.status = 0;
+    }
+  }
 }
 
 // todos collection

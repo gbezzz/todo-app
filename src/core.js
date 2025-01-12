@@ -38,13 +38,15 @@ class Todo {
     description = "",
     priority = 0,
     dueDate = DueDate().getDate(),
-    checkList = CheckList().getList()
+    checkList = CheckList().getList(),
+    status = 0
   ) {
     this.title = title;
     this.description = description;
     this.priority = priority;
     this.dueDate = dueDate;
     this.checkList = checkList;
+    this.status = status;
   }
 }
 
@@ -82,3 +84,7 @@ const Projects = function () {
 
   return { getProjects, createNewProject };
 };
+
+const todoApp = Projects();
+
+export { todoApp };

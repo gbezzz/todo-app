@@ -34,8 +34,8 @@ const DueDate = function () {
 // todos definition
 class Todo {
   constructor(
-    title = "",
-    description = "",
+    title = "new title",
+    description = "new description",
     priority = 0,
     dueDate = DueDate().getDate(),
     checkList = CheckList().getList(),
@@ -74,7 +74,9 @@ const Projects = function () {
   };
 
   const defaultProject = (name = "default") => {
-    const todo = [];
+    const todo = [
+      new Todo("title", "description", 0, new DueDate(), new CheckList()),
+    ];
     return { name, todo, addTodoToProject, emptyProject };
   };
 
@@ -86,7 +88,10 @@ const Projects = function () {
     return { name, todo, addTodoToProject, emptyProject };
   }
 
-  const createNewProject = () => projects.push(newProject());
+  const createNewProject = () => {
+    projects.push(newProject());
+    return projects;
+  };
 
   const getProjects = () => projects;
 
@@ -95,4 +100,4 @@ const Projects = function () {
 
 const todoApp = Projects();
 
-export { todoApp };
+export { todoApp, Todo };

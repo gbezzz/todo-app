@@ -69,6 +69,11 @@ header {
   padding: 10px;
 }
 
+.options {
+  display: flex;
+  gap: 10px;
+}
+
 .title,
 .description,
 .priority,
@@ -92,4 +97,24 @@ header {
   display: flex;
   flex-direction: column;
   flex: 1;
+}
+
+.form-input {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  padding: 20px;
+
+  height: 50vh;
+  width: 50vw;
+}
+
+fieldset {
+  height: 300px;
+}
+
+li {
+  font-size: large;
+  padding: 5px;
 }

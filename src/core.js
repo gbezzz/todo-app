@@ -14,7 +14,7 @@ const CheckList = function () {
     return list;
   };
 
-  return { getList, updateList, emptyList };
+  return { list, getList, updateList, emptyList };
 };
 
 // due date factory
@@ -37,8 +37,8 @@ class Todo {
     title = "new title",
     description = "new description",
     priority = 0,
-    dueDate = DueDate().getDate(),
-    checkList = CheckList().getList(),
+    dueDate = DueDate(),
+    checkList = CheckList(),
     status = 0
   ) {
     this.title = title;
@@ -84,7 +84,15 @@ const Projects = function () {
   projects.push(defaultTodo);
 
   function newProject(name = "New Project") {
-    const todo = [];
+    const todo = [
+      new Todo(
+        "new title",
+        " new description",
+        0,
+        new DueDate(),
+        new CheckList()
+      ),
+    ];
     return { name, todo, addTodoToProject, emptyProject };
   }
 

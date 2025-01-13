@@ -1,5 +1,5 @@
-import "./styles.css";
-import { todoApp, Todo } from "./core";
+import { todoApp } from "./core";
+import { format } from "date-fns";
 
 const projectList = todoApp.getProjects();
 const sidebarContent = document.querySelector(".sidebar-content");
@@ -58,9 +58,19 @@ const mainContent = document.querySelector(".main-content");
       todoTitle.textContent = `Title: ${todoList[todoIndex].title}`;
       mainContent.appendChild(todoTitle);
 
+      const optionsDiv = document.createElement("div");
+      optionsDiv.classList.add("options");
+      todoTitle.appendChild(optionsDiv);
+
       const editTodo = document.createElement("button");
+      editTodo.classList.add("edit-button");
       editTodo.textContent = "Edit";
-      todoTitle.appendChild(editTodo);
+      optionsDiv.appendChild(editTodo);
+
+      const deleteTodo = document.createElement("button");
+      deleteTodo.classList.add("delete-button");
+      deleteTodo.textContent = "Delete";
+      optionsDiv.appendChild(deleteTodo);
 
       const todoDescription = document.createElement("div");
       todoDescription.classList.add("description");
@@ -80,9 +90,12 @@ const mainContent = document.querySelector(".main-content");
 
       const todoDate = document.createElement("div");
       todoDate.classList.add("date");
-      todoDate.textContent = `Due Date: ${todoList[
-        todoIndex
-      ].dueDate.getDate()}`;
+      todoDate.textContent =
+        `Due Date: ${todoList[todoIndex].dueDate}` ||
+        `Due Date: ${format(
+          todoList[todoIndex].dueDate.getDate(),
+          "yyyy-MM-dd"
+        )}`;
       mainContent.appendChild(todoDate);
 
       const todoStatus = document.createElement("div");
@@ -96,13 +109,81 @@ const mainContent = document.querySelector(".main-content");
 
       const todoCheckList = document.createElement("ul");
       todoCheckList.classList.add("list");
-      const checkList = todoList[todoIndex].checkList.getList();
+      const checkList = todoList[todoIndex].checkList.list;
       checkList.forEach((item) => {
         const todoCheckListChild = document.createElement("li");
         todoCheckListChild.textContent = item;
         todoCheckList.appendChild(todoCheckListChild);
       });
       mainContent.appendChild(todoCheckList);
+
+      const editTodoModal = document.querySelector(".edit-dialog");
+      const closeModalButton = document.querySelector(".x");
+
+      editTodo.addEventListener("click", () => {
+        editTodoModal.showModal();
+      });
+
+      closeModalButton.addEventListener("click", () => {
+        editTodoModal.close();
+      });
+
+      const checklistContainer = document.querySelector(".checklist-container");
+      const addButton = document.querySelector(".add-checklist-item");
+
+      // Add a new checklist item
+      addButton.addEventListener("click", () => {
+        const itemWrapper = document.createElement("div");
+        itemWrapper.className = "checklist-item";
+
+        const input = document.createElement("input");
+        input.type = "text";
+        input.placeholder = "Checklist item";
+        input.name = "checklist";
+
+        const removeButton = document.createElement("button");
+        removeButton.type = "button";
+        removeButton.textContent = "Remove";
+
+        removeButton.addEventListener("click", () => {
+          itemWrapper.remove(); // Remove the checklist item
+        });
+
+        itemWrapper.appendChild(input);
+        itemWrapper.appendChild(removeButton);
+        checklistContainer.appendChild(itemWrapper);
+      });
+
+      const editTodoForm = document.querySelector(".edit-todo");
+
+      editTodoForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(editTodoForm);
+        const dataObject = {};
+        formData.forEach((value, key) => {
+          if (key in dataObject) {
+            // Handle multiple values for the same key (e.g., checklist items)
+            if (Array.isArray(dataObject[key])) {
+              dataObject[key].push(value);
+            } else {
+              dataObject[key] = [dataObject[key], value];
+            }
+          } else {
+            dataObject[key] = value;
+          }
+        });
+        console.log("Form Data:", dataObject);
+        alert("Todo updated successfully!");
+        editTodoForm.reset();
+
+        todoList[todoIndex].title = dataObject.title;
+        todoList[todoIndex].description = dataObject.description;
+        todoList[todoIndex].priority = dataObject.priority;
+        todoList[todoIndex].dueDate = dataObject.dueDate;
+        todoList[todoIndex].status = dataObject.status;
+        todoList[todoIndex].checkList.list = dataObject.checklist;
+      });
     });
   });
 })();

@@ -1,3 +1,18 @@
+function saveToStorage() {
+  // Just save what we have, without changing anything
+  localStorage.setItem(
+    "todoApp_projects",
+    JSON.stringify(todoApp.getProjects())
+  );
+  console.log("Saved to storage:", todoApp.getProjects()); // This helps us see what's being saved
+}
+
+function loadFromStorage() {
+  const saved = localStorage.getItem("todoApp_projects");
+  console.log("Loaded from storage:", saved); // This helps us see what's being loaded
+  return saved ? JSON.parse(saved) : null;
+}
+
 // check list factory
 const CheckList = function () {
   const list = [];
@@ -60,18 +75,50 @@ class Todo {
 
 // todos collection
 const Projects = function () {
-  const projects = [];
+  // First get projects from storage or use empty array
+  let projects = loadFromStorage() || [];
 
-  //   todo is a property of a project that's an array
+  // Define these functions first so they can be used in the project objects
   const addTodoToProject = (todo) => {
     todo.push(new Todo());
+    saveToStorage(); // Save when adding todo
     return "New Todo Created";
   };
 
   const emptyProject = (todo) => {
     todo.splice(0, todo.length);
+    saveToStorage(); // Save when emptying project
     return "Project emptied";
   };
+
+  // Only rebuild projects if we loaded something from storage
+  if (projects.length > 0) {
+    projects = projects.map((project) => {
+      // Recreate each todo with its methods
+      const rebuiltTodos = project.todo.map((todoData) => {
+        // Create a new Todo with the saved data
+        const todo = new Todo(
+          todoData.title,
+          todoData.description,
+          todoData.priority,
+          DueDate(), // Add these back
+          CheckList()
+        );
+        // Copy over the simple properties
+        todo.status = todoData.status;
+        todo.checkList.list = todoData.checkList.list;
+        return todo;
+      });
+
+      // Return the project with its methods restored
+      return {
+        name: project.name,
+        todo: rebuiltTodos,
+        addTodoToProject,
+        emptyProject,
+      };
+    });
+  }
 
   const defaultProject = (name = "default") => {
     const todo = [
@@ -80,8 +127,12 @@ const Projects = function () {
     return { name, todo, addTodoToProject, emptyProject };
   };
 
-  const defaultTodo = defaultProject();
-  projects.push(defaultTodo);
+  // Create default project if no projects exist
+  if (projects.length === 0) {
+    const defaultTodo = defaultProject();
+    projects.push(defaultTodo);
+    saveToStorage(); // Save initial default project
+  }
 
   function newProject(name = "New Project") {
     const todo = [
@@ -98,6 +149,7 @@ const Projects = function () {
 
   const createNewProject = () => {
     projects.push(newProject());
+    saveToStorage(); // Save when creating new project
     return projects;
   };
 
@@ -108,4 +160,4 @@ const Projects = function () {
 
 const todoApp = Projects();
 
-export { todoApp, Todo };
+export { todoApp, saveToStorage, loadFromStorage };
